@@ -6,13 +6,11 @@ import mongoose from "mongoose";
 import postRoutes from "./routes/postsRoutes.js";
 
 const app = express();
-
+dotenv.config();
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/posts", postRoutes);
-
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const DB_URL = process.env.DB_URL;
