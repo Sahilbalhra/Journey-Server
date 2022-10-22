@@ -31,7 +31,7 @@ export const createPost = async (req, res) => {
 
   const post = req.body
 
-  const newPost = new postModel({ ...post, creator:req.userId, createdAt: new Date().toISOString() });
+  const newPost = new postModel({ ...post, creator: req.userId, createdAt: new Date().toISOString() });
   try {
     // console.log(req.body);
     await newPost.save()
@@ -95,7 +95,7 @@ export const likePost = async (req, res) => {
       return res.status(400).json({
         message: "user is not authorized"
       })
-    } ;
+    };
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(404).send("No Post with this id")
@@ -154,3 +154,21 @@ export const updatePost = async (req, res) => {
     });
   }
 };
+
+export const getPostsBySearch = async (req, res) => {
+  const { searchQuery, tags } = req.query
+  try {
+    const title = new RegExp(searchQuery, 'i');
+    const posts = await postModel.find(
+      {
+        $or: [{ title }, { tags: { $in: tags.split(',') } }]
+      }
+    )
+    res.json({
+      data: posts
+    })
+
+  } catch (error) {
+    res.status(404).json({ message: error.message })
+  }
+}
