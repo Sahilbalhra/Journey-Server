@@ -2,10 +2,15 @@ import mongoose from "mongoose";
 import postModel from "../models/postModel.js";
 
 export const getPosts = async (req, res) => {
+  const { page } = req.query;
+
   try {
-    const posts = await postModel.find();
+    const LIMIT = 6;
+    const startIndex = (Number(page) - 1) * LIMIT
+    const total = await postModel.countDocuments({})
+    const posts = await postModel.find().sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
     if (posts) {
-      res.status(201).json(posts);
+      res.status(201).json({data:posts,currentPage:Number(page),numberOfPages:Math.ceil(total/LIMIT)});
     }
   } catch (error) {
     res.status(409).json({
