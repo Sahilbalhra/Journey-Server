@@ -10,7 +10,7 @@ export const getPosts = async (req, res) => {
     const total = await postModel.countDocuments({})
     const posts = await postModel.find().sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
     if (posts) {
-      res.status(201).json({data:posts,currentPage:Number(page),numberOfPages:Math.ceil(total/LIMIT)});
+      res.status(201).json({ data: posts, currentPage: Number(page), numberOfPages: Math.ceil(total / LIMIT) });
     }
   } catch (error) {
     res.status(409).json({
@@ -174,6 +174,28 @@ export const getPostsBySearch = async (req, res) => {
     })
 
   } catch (error) {
+    res.status(404).json({ message: error.message })
+  }
+}
+
+export const commentPost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("commenr id:",id)
+    const { value } = req.body;
+    console.log("value:",value)
+    const post = await postModel.findById(id);
+    post.comments.push(value)
+    const updatedPost = await postModel.findByIdAndUpdate(id, post, { new: true })
+    if(!updatePost){
+      res.json({
+        message:"connot comment the post"
+      })
+    }
+      // console.log("updated post",updatedPost)
+    res.send(updatedPost)
+  } catch (error) {
+    console.log("in comment post")
     res.status(404).json({ message: error.message })
   }
 }
